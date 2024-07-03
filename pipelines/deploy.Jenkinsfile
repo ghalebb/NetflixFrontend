@@ -8,21 +8,36 @@ pipeline {
         string(name: 'IMAGE_FULL_NAME_PARAM', defaultValue: '', description: '')
     }
 
-    stages {
-        stage('Deploy') {
-            steps {
-                /*
+    stage('Deploy') {
+    steps {
+        script {
+            // Update the YAML manifests with the new image name
+            sh '''
+              cd k8s
+              cd $SERVICE_NAME
+              git checkout main
+              # Replace the image name in the deployment YAML file
+              sed -i "s|image:.*|image: ${IMAGE_FULL_NAME_PARAM}|g" deploymentFront.yaml
 
-                Now your turn! implement the pipeline steps ...
 
-                - `cd` into the directory corresponding to the SERVICE_NAME variable.
-                - Change the YAML manifests according to the new $IMAGE_FULL_NAME_PARAM parameter.
-                  You can do so using `yq` or `sed` command, by a simple Python script, or any other method.
-                - Commit the changes, push them to GitHub.
-                   * Setting global Git user.name and user.email in 'Manage Jenkins > System' is recommended.
-                   * Setting Shell executable to `/bin/bash` in 'Manage Jenkins > System' is recommended.
-                */
-            }
+              # Print the updated deployment YAML to verify the change
+              echo "Updated deploymentFront.yaml:"
+              cat deploymentFront.yaml
+
+              git config --global user.email "jenkins@example.com"
+              git config --global user.name "Jenkins"
+
+              git remote set-url origin https://${GITHUB_TOKEN_PSW}@github.com/ghazalkhateeb/NetflixInfra.git
+
+
+              git add deploymentFront.yaml
+              git commit -m "Update deployment image to ${IMAGE_FULL_NAME_PARAM}"
+              git push origin main
+
+            '''
+
+
         }
     }
+}
 }
