@@ -2,7 +2,7 @@
 
 pipeline {
     agent {
-        label 'genera'
+        label 'general'
     }
 
     triggers {
