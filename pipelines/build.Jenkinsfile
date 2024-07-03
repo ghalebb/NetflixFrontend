@@ -1,10 +1,8 @@
 // pipelines/build.Jenkinsfile
 
 pipeline {
-    agent {
-        label 'general'
-    }
-    
+    agent any
+
     triggers {
         githubPush()
     }
@@ -14,10 +12,10 @@ pipeline {
             steps {
                 sh '''
                     # your pipeline commands here....
-                    
+
                     # for example list the files in the pipeline workdir
-                    ls 
-                    
+                    ls
+
                     # build an image
                     docker build -t netflix-front .
                 '''
@@ -25,5 +23,3 @@ pipeline {
         }
     }
 }
-
-
